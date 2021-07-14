@@ -1,0 +1,22 @@
+{
+  "name": "pqr",
+  "version": "1.0.0",
+  "description": "Sistema de gestion PQR amigos de la salud",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "author": "Luis Rivero Romero",
+  "license": "ISC",
+  "dependencies": {
+    "@ant-design/icons": "^4.6.2",
+    "antd": "^4.16.6",
+    "mariadb": "^2.5.4",
+    "next": "^11.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}
