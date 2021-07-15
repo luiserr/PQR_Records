@@ -1,6 +1,6 @@
 import db from '../../connection/db';
 
-export async function getRecords() {
+export default async function getRecords() {
   const sql = `select * from records as r where r.status = 'new';`;
   try {
     const connection = await db();

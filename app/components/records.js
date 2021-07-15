@@ -45,6 +45,6 @@ function onChange(pagination, filters, sorter, extra) {
 }
 
 export default function TableRecords({data, handleView}) {
-  return (<Table columns={getColumns(handleView)} dataSource={data} onChange={onChange}/>);
+  return (<Table columns={getColumns(handleView)} dataSource={data} onChange={onChange} key={'id'}/>);
 }
 

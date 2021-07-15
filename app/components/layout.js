@@ -18,8 +18,8 @@ export default function Layout({children}) {
       <Menu show={showMenu} handleMenu={handleMenu}/>
       <Header>
         <div className="logo">
-          <BarsOutlined onClick={handleMenu}/>
-          Registro de atencion PQR
+          {/*<BarsOutlined onClick={handleMenu}/>*/}
+          Registro de atención PQR
         </div>
       </Header>
       <Content style={{padding: '0 50px'}}>
