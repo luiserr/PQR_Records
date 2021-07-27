@@ -1,0 +1,84 @@
+adminer
+asterisk@admin
+
+- instalacion del ssh
+sudo aptitude install ssh
+
+- instalacion de mariadb
+sudo aptitude install mariadb-server
+
+- crear BD
+create database asteriskcdr;
+
+- Crear Usuario
+create user 'asterisk' identified by 'asterisk@mariadb';
+
+- Otorgar usuarios a asterisk
+grant all privileges on asteriskcdr.* to 'asterisk' identified by 'asterisk@mariadb';
+
+- permitir conexiones remotas
+nano /etc/mysql/my.cnf
+añadimos: bind-address = 0.0.0.0
+
+- reiniciamos maria-db
+systemctl restart mariadb
+
+- Creamos la tabla cdr
+
+	CREATE TABLE cdr ( 
+        calldate timestamp NOT NULL , 
+        clid varchar (80) NOT NULL , 
+        src varchar (80) NOT NULL , 
+        dst varchar (80) NOT NULL , 
+        dcontext varchar (80) NOT NULL , 
+        channel varchar (80) NOT NULL , 
+        dstchannel varchar (80) NOT NULL , 
+        lastapp varchar (80) NOT NULL , 
+        lastdata varchar (80) NOT NULL , 
+        duration int NOT NULL , 
+        billsec int NOT NULL , 
+        disposition varchar (45) NOT NULL , 
+        amaflags int NOT NULL , 
+        accountcode varchar (20) NOT NULL , 
+        peeraccount varchar(20) NOT NULL ,        
+        uniqueid varchar (150) NOT NULL ,
+        linkedid varchar(150) NOT NULL ,
+        userfield varchar (255) NOT NULL 
+);
+
+- Instalar ODBC
+aptitude install  unixodbc unixodbc-dev
+
+- Instalar Driver ODBC para mariadb
+aptitude install odbc-mariadb
+
+- Instalacion de automake, creador de makefiles para paquetes GNU
+sudo aptitude install automake make
+
+- Instalar pkg-config
+
+- Instalar SQLite
+aptitude install sqlite3 libsqlite3-dev
+
+- Instalar UUID
+aptitude install uuid uuid-dev 
+
+- instalar WAV y SPEEX
+aptitude install wavpack speex
+
+ - Instalar Festival
+aptitude install festival festival-dev
+
+-Instalacion de LAME
+aptitude install lame
+
+- Instalacion de sox, para la manipulacion y la conversion de archivos de audio
+aptitude install sox
+
+Instalar SpanDSP, un procesador de señales digitales que en Asterisk, permite la instalación del modulo res_fax
+	sudo aptitude install libtiff5 libtiff5-dev libspandsp2 libspandsp-dev libspandsp-doc
+
+
+
+
+

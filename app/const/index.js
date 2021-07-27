@@ -1,0 +1,1 @@
+export const PATH_RECORD = '/home/luiserr/pqr/public/records/';

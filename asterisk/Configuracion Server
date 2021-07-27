@@ -1,0 +1,326 @@
+Deshabilitar Raid del Servidor para que se pueda configurar por software
+
+Nombre Equipo: AsteriskEPS-Nextin
+Nombre de Usuario: Nextin
+Usuario: nextin
+Contraseña: NextinASTERISKEPSSn3x71n5@5
+
+Para particionar el disco
+		Seleccionas partionar de forma manual
+		/ (Sistema) 100 GB
+		/home (Datos) 880.2 GB
+		swap 20 GB
+
+Instalamos Aptitude
+		$ sudo apt-get install aptitude
+
+Actualizamos el sistema
+		sudo aptitude update
+		sudo aptitude upgrade
+
+Iinstalacion de nano
+	sudo aptitude install nano	
+
+
+								********************************
+								*	Configuracion de red       *
+								********************************	
+
+	
+Modificamos la configuracion de la tarjeta de red
+	sudo nano /etc/network/interfaces
+
+se añade las siguientes lineas en el archivo
+	iface eth0 inet static
+	address 192.168.1.30
+	netmask 255.255.255.0
+	network 192.168.1.0
+	broadcast 192.168.1.255
+	gateway 192.168.1.1
+
+en el archivo resolv.conf añadimos un dns
+	sudo nano /etc/resolv.conf 
+añadimos
+	nameserver 8.8.8.8
+
+								********************************
+								*		Instalacion de SSH	   *
+								********************************	
+
+Instalamos el servidor SSH
+		sudo aptitude install ssh
+
+Modificamos los archivos hosts.allow y hosts.deny
+	sudo nano /etc/hosts.allow
+		sshd: ALL
+	sudo nano /etc/hosts.deny
+		ALL: ALL
+
+Configuramos el acceso SSH del usuario administrador (nextin)
+	SERVIDOR
+		# su nextin
+		$ cd /home/nextin/
+		$ mkdir .ssh (Creamos el directorio .ssh para el usuario administrador)
+		$ sudo chmod 700 .ssh/
+		$ cd .ssh
+
+		$ touch authorized_keys (Este contrendra las llaves autorizadas para conectarse como usuario administrador)
+		$ mkdir keys_rsa (Creamos un directorio para copiar todas las llaves que autoricemos para tener un mejor control)
+		$ sudo ssh-keygen -q -b 2048 -t rsa (Generamos una llave para el administrador) 
+			nombre: AsteriskNextinssh , La clave es NextinASTERISKn3x71n55h
+		$ sudo ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key (Verificar el fingerprint)
+			2048 1e:86:7c:8c:fe:ed:a2:75:0d:c5:45:58:2a:96:62:ee  root@NextinDesarrollo (RSA)
+			RSA key fingerprint is 1e:86:7c:8c:fe:ed:a2:75:0d:c5:45:58:2a:96:62:ee.
+		$ sudo chmod 700 -R keys_rsa/ (Cambiamos los permisos de la carpeta para mayor seguridad)
+		$ sudo chmod 600 authorized_keys (Cambiamos los permisos de la carpeta para mayor seguridad)
+		$ sudo chmod 600 AsteriskNextinssh (Cambiamos los permisos de la carpeta para mayor seguridad)
+		$ sudo chmod 644 AsteriskNextinssh.pub (Cambiamos los permisos de la carpeta para mayor seguridad)
+	CLIENTE
+	    #$ ssh-keygen -q -b 2048 -t rsa (Generamos una llave para el administrador) La clave es NextinCLIENTEn3x71n55h
+		$ scp -P 22 ~/.ssh/ssh_host_rsa_key.pub nextin@91.142.222.206:~/.ssh/llaves_rsa/ssh_host_rsa_key_Jorge.pub
+	SERVIDOR
+		$ cd .ssh
+		$ cat llaves_rsa/ssh_host_rsa_key_Jorge.pub >> authorized_keys
+
+
+Creamos una copia del archivo /etc/ssh/sshd_config
+	sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.old
+
+Modificamos el archivo /etc/ssh/sshd_config
+	#Port 22
+		Port 1022
+	#AddressFamily any # default
+	#AddressFamily inet # solo IPv4
+	#AddressFamily inet6 # solo IPv6
+		AddressFamily inet
+	#ServerKeyBits 1024
+		ServerKeyBits 2048
+	#LoginGraceTime 120
+		LoginGraceTime 30
+	#PermitRootLogin prohibit-password
+		PermitRootLogin no
+
+		MaxAuthTries 2
+		MaxStartups 3
+	#AuthorizedKeysFile      %h/.ssh/authorized_keys
+		AuthorizedKeysFile      %h/.ssh/authorized_keys
+	#IgnoreUserKnownHosts yes
+		IgnoreUserKnownHosts yes
+		AllowTcpForwarding no
+	#PasswordAuthentication yes
+		PasswordAuthentication no
+	#PrintMotd no
+		PrintMotd yes
+	#TCPKeepAlive yes
+		TCPKeepAlive no
+	#UseLogin no
+		UseLogin no
+		ClientAliveInterval 30
+		ClientAliveCountMax 3
+
+
+*en el archivo /etc/ssh/sshd_config
+hay que cambiar la linea, permitRootLogin=yes por "no"
+y la linea passwordAuthentication=yes por no
+
+								********************************
+								*	Instalacion de postgres    *
+								********************************
+
+Adicionamos el repositorio de la ultima version de postgres
+	Editamos el archivo sources.list
+		sudo nano /etc/apt/sources.list
+	Adicionamos
+		deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main
+	Importamos la key del repositorio y actualizamos
+		wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
+		  sudo apt-key add -
+		sudo aptitude update
+
+Instalacion de postgresql
+	sudo aptitude install postgresql postgresql-client postgresql-contrib libpq-dev
+
+Activar Conexiones remotas
+	sudo nano /etc/postgresql/9.5/main/pg_hba.conf
+	# "local" is for Unix domain socket connections only
+	local   all             all                                     peer
+	# IPv4 local connections:
+	host    all             all             127.0.0.1/32            md5
+	# IPv6 local connections:
+	host    all             all             0.0.0.0 0.0.0.0                 md5
+
+Habilitar escuchar desde otros host
+	sudo nano /etc/postgresql/9.5/main/postgresql.conf 
+	#listen_addresses = 'localhost'         # what IP address(es) to listen on;
+	listen_addresses = '*'          # what IP address(es) to listen on;
+
+Crear usuario de asterisk en el motor de postgres
+	sudo su postgres
+	psql
+	create user asterisk password 'asteriskcacn3x71n5@5';
+
+creamos la base de datos de asterisk
+	create database asteriskcdr;
+	GRANT ALL PRIVILEGES ON DATABASE asteriskcdr TO asterisk;
+
+crear la tabla CDR
+	CREATE TABLE cdr ( 
+        calldate timestamp NOT NULL , 
+        clid varchar (80) NOT NULL , 
+        src varchar (80) NOT NULL , 
+        dst varchar (80) NOT NULL , 
+        dcontext varchar (80) NOT NULL , 
+        channel varchar (80) NOT NULL , 
+        dstchannel varchar (80) NOT NULL , 
+        lastapp varchar (80) NOT NULL , 
+        lastdata varchar (80) NOT NULL , 
+        duration int NOT NULL , 
+        billsec int NOT NULL , 
+        disposition varchar (45) NOT NULL , 
+        amaflags int NOT NULL , 
+        accountcode varchar (20) NOT NULL , 
+        peeraccount varchar(20) NOT NULL ,        
+        uniqueid varchar (150) NOT NULL ,
+        linkedid varchar(150) NOT NULL ,
+        userfield varchar (255) NOT NULL 
+);
+
+Cambiar la contraseña del usuario postgres
+	sudo passwd postgres
+	->PostgresASTERISKn3x71n5@5
+
+Cambiar la contraseña del usuario postgres en el motor
+	ALTER USER postgres WITH PASSWORD 'PostgresASTERISKn3x71n5@5';
+
+Instalacion Driver PHP Postgres(Si esta Apache instalado)
+	sudo aptitude install postgresql postgresql-client postgresql-contrib libpq-dev
+
+Instalacion de ODBCunix
+	sudo aptitude install unixodbc-bin unixodbc unixodbc-dev
+
+Instalacion del driver ODBC para postgres
+	sudo aptitude install odbc-postgresql
+
+*Aplicando el archivo de plantilla a la entrada del controlador 
+	sudo odbcinst -i -d -f /usr/share/psqlodbc/odbcinst.ini.template
+	sudo odbcinst -i -s -l  -n adyoung-pg -f /usr/share/doc/odbc-postgresql/examples/odbc.ini.template
+
+Instalacion de automake, creador de makefiles para paquetes GNU
+	sudo aptitude install automake
+
+Instalacion de pkg-config, Gestione las opciones de compilación y enlazado de las bibliotecas
+	sudo aptitude install pkg-config
+
+La base de datos de asterisk interna se basa en SQLITE se instala este paquete y la libreria de desarrollo
+	sudo aptitude install sqlite3 libsqlite3-dev
+
+Libuuid y uiid para la correcta compilación de las librerías de PjSIP y el correcto funcionamiento del
+	sudo aptitude install uuid uuid-dev 
+
+Instlacion de formatos audio: SPEEX y WAW:
+	sudo aptitude install wavpack speex
+
+Instalacion del sintetizador de voz festival
+	sudo aptitude install festival festival-dev
+
+Instalacion de lame, Codificador de audio
+	sudo aptitude install lame
+
+Instalacion de sox, para la manipulacion y la conversion de archivos de audio
+	sudo aptitude install sox
+
+Instalacion de Dahdi manejador de driver para tarjetas Telefonicas
+	cd /usr/src/
+	sudo mkdir Dahdi
+	--copiar el enlace de descarga de Dahdi 
+	sudo wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
+	sudo tar -xf dahdi-linux-complete-current.tar.gz 
+	cd /usr/src/dahdi/dahdi-linux-complete-*
+	sudo make all
+	sudo make intall
+	sudo make config
+
+Instalacion de libpri, En el caso que en el servidor Asterisk se quiera instalar tarjetas digitales (E1, T1, ISDN)
+	cd /usr/src
+	sudo mkdir libpri
+	cd libpri
+	sudo wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-current.tar.gz
+	sudo tar -xvfz libpri-current.tar.gz
+	cd libpri-*
+	make
+	make install
+
+Instalar SpanDSP, un procesador de señales digitales que en Asterisk, permite la instalación del modulo res_fax
+	sudo aptitude install libtiff5 libtiff5-dev libspandsp2 libspandsp-dev libspandsp-doc
+
+	sudo aptitude install libxml2 libxml2-dev 
+
+Instalacion del protocolo XMPP, El protocolo XMPP permite conexione seguras entre cliente y servidor utilizando el protocolo TLS
+	sudo aptitude install gnutls-bin libiksemel3 libiksemel-dev libiksemel-utils
+
+Instalacion de SendMail, Servidor de correos electronicos
+	sudo aptitude install sendmail sendmail-doc
+
+Instalacion de SNMP, Protocolo Simple de Administración de Red y sirve para controlar y monitorear el desempeño del servidor Linux
+	 sudo aptitude install snmp
+
+instalación de libsrtp, implementar cifrado de flujo media en asterisk
+	sudo aptitude install libsrtp0 libsrtp0-dev
+
+instalacion de subversion
+	sudo aptitude install lisvn-dev libsvn-doc subversion
+
+si sale error configure: error: C++ preprocessor "/lib/cpp" fails sanity check
+	sudo aptitude install g++
+
+Instlacion de la liberia Jansson para el soporte de las nuevas REST API
+	cd /usr/src
+	sudo mkdir jansson
+	cd jansson
+	sudo wget http://www.digip.org/jansson/releases/jansson-2.6.tar.gz
+	sudo tar -xf jasson-2.6.tar.gz
+	cd jansson-*
+	sudo ./configure --prefix=/usr --libdir=/usr/lib64
+	sudo make 
+	sudo make  install
+	
+ aptitude install libjansson4 libjansson-doc libjansson-dev
+
+Instalar portaudio y la libreria de desarrollo de python, necesario para la pila SIP PJSIP
+	sudo aptitude install libportaudio2 portaudio19-dev portaudio19-doc
+	sudo aptitude install python-dev
+
+Instalacion de Asterisk
+	cd /usr/src
+	mkdir asterisk
+	cd asterisk
+	sudo wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
+	sudo tar -xvfz asterisk-*
+	cd asterisk-*	
+	sudo contrib/scripts/install_prereq install
+	sudo ./configure 
+	sudo contrib/scripts/get_mp3_source.sh
+	sudo make menuselect #Seleccionar los modulos a cargar
+	hacemos el make, ojo demora 10 min
+	sudo make 
+	hacemos la instalacion, ojo demora bastante
+	sudo make install	
+	sudo make samples
+	sudo make config	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

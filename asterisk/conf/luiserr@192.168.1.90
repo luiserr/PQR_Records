@@ -1,0 +1,116 @@
+[general]
+context=default
+allowguest=no
+allowtransfer=yes
+match_auth_username=yes
+recordonfeature=automixmon
+recordofffeature=automixmon
+udpbindaddr=0.0.0.0:5060
+tcpenable=yes
+tcpbindaddr=0.0.0.0:5060
+tcpauthtimeout=30
+tcpauthlimit=100
+transport=udp
+srvlookup=yes
+maxexpiry=3600
+minexpiry=60
+defaultexpiry=120
+submaxexpiry=3600
+subminexpiry=60
+mwiexpiry=3600
+maxfordwards=70
+qualifyfreq=60
+keepalive=yes
+preferred_codec_only=no
+disallow=all
+allow=ulaw
+allow=alaw
+mohinterpret=default
+mohsuggest=default
+parkinglot=default
+language=es
+timezone=yes
+relaxdtmf=no
+sendrpid=yes
+trustrpid=yes
+rpid_update=yes
+useragent=VozToVoice v. 1.0
+auth_options_requests=no
+accept_autofcall_message=yes
+autofcall_message_context=message
+auth_message_request=yes
+session-timers=originate
+session-expires=600
+session-minse=90
+session-refresher=uas
+sdpsession=asterisk
+sdpowner=asterisk
+dtmfmode=rfc2833
+videosupport=yes
+maxcallbirate=384
+callevents=yes
+authfailureevents=yes
+alwaysauthreject=yes
+use_q850_reason=yes
+rtptimeout=60
+rtpholdtimeout=300
+rtpkeepalive=0
+allowsubscribe=yes
+subscribecontext=subscribe
+notifyringing=yes
+notifyhold=yes
+callcounter=yes
+;t38pt_udptl_=yes,fec,maxdatagram=400
+faxdetect=yes
+icesupport=no
+nat=force_rport,comedia
+directmedia=no
+
+#include sip_pstn.conf
+;#include sip_gsm.conf
+
+[extensiones](!)
+type=friend
+language=es
+qualify=yes
+host=dynamic
+dtmfmode=rfc2833
+context=contact-center
+directmedia=no
+callgroup=1
+pickupgroup=1
+disallow=all
+allow=g722
+allow=alaw
+allow=ulaw
+allow=g729
+allow=h263
+
+;Asesor 1
+[100](extensiones)
+accountcode=100
+secret=asesor100*
+mailbox=100@default
+callerid=asesor1 <100>
+
+;Asesor 2
+[101](extensiones)
+accountcode=101
+secret=asesor101*
+mailbox=101@default
+callerid=asesor2<101>
+
+;Asesor 3
+;Extension de Pruebas
+[102](extensiones)
+accountcode=102
+secret=asesor102*
+mailbox=102@default
+callerid= asesor<102>
+
+;Asesor 4
+[103](extensiones)
+accountcode=103
+secret=asesor103*
+mailbox=103@default
+callerid= Asesor4<103>
