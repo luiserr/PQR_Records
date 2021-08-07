@@ -31,7 +31,7 @@ export default function Player({visible, setVisible, record = {}}) {
       <p><b>Identificación:</b> {record.dni} </p>
       <p><b>Fecha:</b> {record.createdAt} </p>
       <audio controls>
-        <source src={`/records/${record.fileName}`} type="audio/mp3"/>
+        <source src={visible ? `/records/${record.fileName}` : ''} type="audio/wav"/>
       </audio>
     </Modal>
   );
