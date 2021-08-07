@@ -33,7 +33,7 @@ export default function Home({myRecords}) {
   return (
     <Layout>
       <TableRecords data={records} handleView={handleView}/>
-      <Player visible={visible} setVisible={setVisible} record={record}/>
+      {visible ? <Player visible={visible} setVisible={setVisible} record={record}/> : <div/>}
     </Layout>
   );
 };
