@@ -14,7 +14,6 @@ export default function Player({visible, setVisible, record = {}}) {
         'Content-Type': 'application/json',
       },
     });
-    console.log(result.json().success, result);
     setVisible(false);
   };
 
@@ -29,6 +28,7 @@ export default function Player({visible, setVisible, record = {}}) {
     >
       <p><b>Tipo identificación:</b> {record.typeDni} </p>
       <p><b>Identificación:</b> {record.dni} </p>
+      <p><b>Teléfono:</b> {record.phone} </p>
       <p><b>Fecha:</b> {record.createdAt} </p>
       <audio controls>
         <source src={visible ? `/records/${record.fileName}` : ''} type="audio/wav"/>

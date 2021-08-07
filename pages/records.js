@@ -1,7 +1,6 @@
 
 
 export default function Records({records = []}) {
-  console.log(records);
   return <TableRecords data={[]}/>
 };
 

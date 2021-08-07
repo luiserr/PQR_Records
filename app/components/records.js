@@ -26,6 +26,11 @@ function getColumns(handleView) {
       onFilter: (value, record) => record.dni.indexOf(value) === 0,
     },
     {
+      title: 'Teléfono',
+      dataIndex: 'phone',
+      onFilter: (value, record) => record.phone.indexOf(value) === 0,
+    },
+    {
       title: 'Ver',
       dataIndex: '',
       key: 'x',
